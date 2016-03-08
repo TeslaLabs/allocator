@@ -8,16 +8,12 @@ class Person(object):
 
 
 class Fellow(Person):
-    can_have_living_space = True
-
-    def __init__(self, name, chooses_living_space):
+    def __init__(self, name, living_space_choice):
         super().__init__(name)
-        self.chooses_living_space = chooses_living_space
+        self.living_space_choice = living_space_choice
 
 
 class Staff(Person):
-    can_have_living_space = False
-
     def __init__(self, name):
         super().__init__(name)
 
@@ -25,19 +21,25 @@ class Staff(Person):
 class Room(object):
     def __init__(self, name):
         self.name = name
+        self.occupants = []
+        self.capacity = None
+
+    def add_person(self, person):
+        # Check if the person is an instance of the Person class
+        # and if the room is already full, then allocate
+        if isinstance(person, Person) and len(self.occupants) < self.capacity:
+            self.occupants.append(person)
 
 
 class LivingSpace(Room):
-    # All living spaces have a capacity of 4 people
-    capacity = 4
-
     def __init__(self, name):
         super().__init__(name)
+        # All living spaces have a capacity of 4 fellows
+        self.capacity = 4
 
 
 class Office(Room):
-    # All offices have a capacity of 6 people
-    capacity = 6
-
     def __init__(self, name):
         super().__init__(name)
+        # All offices have a capacity of 6 people
+        self.capacity = 6
