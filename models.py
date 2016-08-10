@@ -1,3 +1,8 @@
+from __future__ import print_function
+
+from builtins import super
+
+
 class Facility(object):
     """ Represents a Facility that houses Fellows and Staff e.g. Amity"""
 
@@ -6,42 +11,56 @@ class Facility(object):
         self.rooms = []
         self.people = []
 
-    def create_rooms():
-        """ Creates Rooms in Amity """
-        pass
+    def create_rooms(self, room_type, rooms):
+        """ Creates Rooms in a Facility
 
-    def add_person(person):
-        """ Add a person to the Amity Facility
+            Arguments:
+                room_type: Room type of the rooms to be created
+                rooms: One or more room instances
+        """
+        if room_type not in ('living_space', 'office'):
+            raise ValueError('Invalid Room Type')
+
+        for room_name in rooms:
+            if room_type == 'living_space':
+                room_instance = LivingSpace(room_name)
+                self.rooms.append(room_instance)
+            elif room_type == 'office':
+                room_instance = Office(room_name)
+                self.rooms.append(room_instance)
+
+    def add_person(self, person):
+        """ Add a person to a Facility
 
             Once a person is added, they can be allocated a Room
         """
         self.people.append(person)
 
-    def reallocate_person(person, new_room):
+    def reallocate_person(self, person, new_room):
         """ Reallocate the specified person to the specified room_name. """
         pass
 
-    def load_people(file_path):
+    def load_people(self, file_path):
         """ Add people to rooms from the provided file """
         pass
 
-    def print_allocations():
+    def print_allocations(self, ):
         """ Print a list of allocations onto the screen """
         pass
 
-    def print_unallocated():
+    def print_unallocated(self, ):
         """ Print a list of unallocated people to the screen """
         pass
 
-    def print_room(room_name):
+    def print_room(self, room_name):
         """" Print the names of all the people in room_name on the screen """
         pass
 
-    def save_state(db_name):
+    def save_state(self, db_name):
         """ Persist all the data stored in the app to a SQLite database """
         pass
 
-    def load_state(db_name):
+    def load_state(self, db_name):
         """ Load data from a database into the application """
         pass
 
@@ -99,15 +118,17 @@ class Room(object):
     def print_occupants(self):
         """Print the names of all the people in this room."""
         for num, member in enumerate(self.occupants, start=1):
-            print num, member.name
+            print(num, member.name)
 
     def has_vacancy(self):
-        """Return True if this Room has an available slot or False otherwise."""
+        """
+        Return True if this Room has an available slot or False otherwise.
+        """
         return len(self.occupants) < self.capacity
 
 
 class LivingSpace(Room):
-    """Represents a living space at a Facility."""
+    """Represents a living space in a Facility."""
 
     def __init__(self, name):
         super().__init__(name)
@@ -116,7 +137,7 @@ class LivingSpace(Room):
 
 
 class Office(Room):
-    """Represents an office at a Facility"""
+    """Represents an office in a Facility"""
 
     def __init__(self, name):
         super().__init__(name)
