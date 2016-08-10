@@ -1,16 +1,17 @@
+#!/usr/bin/env python
+
 from __future__ import print_function
 
 import random
 import sys
 
-from allocate import Fellow, LivingSpace, Office, Staff
+from models import Fellow, LivingSpace, Office, Staff
 
 people_file = 'seeds/people.txt'
-rooms_file = 'seeds/rooms.txt'
 
 
 def allocate(people, rooms):
-    """
+    """c
     Parameters
     ----------
     people : list of Person-derived instances
