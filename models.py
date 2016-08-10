@@ -1,3 +1,8 @@
+from __future__ import print_function
+
+from builtins import super
+
+
 class Facility(object):
     """ Represents a Facility that houses Fellows and Staff e.g. Amity"""
 
@@ -99,7 +104,7 @@ class Room(object):
     def print_occupants(self):
         """Print the names of all the people in this room."""
         for num, member in enumerate(self.occupants, start=1):
-            print num, member.name
+            print(num, member.name)
 
     def has_vacancy(self):
         """Return True if this Room has an available slot or False otherwise."""
@@ -107,7 +112,7 @@ class Room(object):
 
 
 class LivingSpace(Room):
-    """Represents a living space at a Facility."""
+    """Represents a living space in a Facility."""
 
     def __init__(self, name):
         super().__init__(name)
@@ -116,7 +121,7 @@ class LivingSpace(Room):
 
 
 class Office(Room):
-    """Represents an office at a Facility"""
+    """Represents an office in a Facility"""
 
     def __init__(self, name):
         super().__init__(name)
