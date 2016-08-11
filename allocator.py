@@ -7,8 +7,8 @@ in one of Andela's facilities called Amity.
 Usage:
   allocator.py create_office <room_name>...
   allocator.py create_living_space <room_name>...
-  allocator.py add_fellow <name>... [--accomodation=n]
-  allocator.py add_staff <name>...
+  allocator.py add_fellows <fellow_name>... [--accomodation=n]
+  allocator.py add_staff <staff_name>...
   allocator.py reallocate_person (<person_identifier> <new_room_name>)...
   allocator.py print_allocations [--output-allocations=allocations.txt]
   allocator.py print_unallocated [--output-unallocated=unallocated.txt]
@@ -46,3 +46,7 @@ if __name__ == '__main__':
         amity.create_rooms('office', args['<room_name>'])
     elif args['create_living_space']:
         amity.create_rooms('living_space', args['<room_name>'])
+    elif args['add_fellows']:
+        amity.add_fellows(args['<fellow_name>'], args['--accomodation'])
+    elif args['add_staff']:
+        amity.add_staff(args['<staff_name>'])
