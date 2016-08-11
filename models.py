@@ -110,13 +110,11 @@ class Facility(object):
         """" Print the names of all the people in room_name on the screen """
         pass
 
-    def save_state(self, db_name):
-        """ Persist all the data stored in the app to a SQLite database """
-        pass
-
-    def load_state(self, db_name):
-        """ Load data from a database into the application """
-        pass
+    @property
+    def rooms(self):
+        """Get the number of rooms in a facility"""
+        count = self.db.query('select count(*) as room_count from rooms')
+        return count.all()[0]['room_count']
 
 
 class Person(object):
