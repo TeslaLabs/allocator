@@ -32,30 +32,18 @@ class Facility(object):
             );
             """)
         self.db.query("""
-            CREATE TABLE IF NOT EXISTS "fellows" (
-                "id"           integer PRIMARY KEY AUTOINCREMENT,
-                "name"         text,
-                "accomodation" text
+            CREATE TABLE IF NOT EXISTS "people" (
+                "id"            integer PRIMARY KEY AUTOINCREMENT,
+                "name"          text UNIQUE,
+                "type"          text,
+                "accomodation"  text
             );
             """)
         self.db.query("""
-            CREATE TABLE IF NOT EXISTS "staff" (
-                "id"   integer PRIMARY KEY AUTOINCREMENT,
-                "name" text
-            );
-            """)
-        self.db.query("""
-            CREATE TABLE IF NOT EXISTS "fellows_rooms" (
-                "id"        integer PRIMARY KEY AUTOINCREMENT,
-                "fellow_id" integer NOT NULL REFERENCES "fellows" ("id"),
-                "room_id"   integer NOT NULL REFERENCES "rooms" ("id")
-            );
-            """)
-        self.db.query("""
-            CREATE TABLE IF NOT EXISTS "staff_rooms" (
-                "id"       integer PRIMARY KEY AUTOINCREMENT,
-                "staff_id" integer NOT NULL REFERENCES "staff" ("id"),
-                "room_id"  integer NOT NULL REFERENCES "rooms" ("id")
+            CREATE TABLE IF NOT EXISTS "people_rooms" (
+                "id"         integer PRIMARY KEY AUTOINCREMENT,
+                "person_id"  integer NOT NULL REFERENCES "people" ("id"),
+                "room_id"    integer NOT NULL REFERENCES "rooms" ("id")
             );
             """)
 
@@ -133,9 +121,7 @@ class Facility(object):
     @property
     def people(self):
         """Get the number of people in a facility"""
-        count = self.db.query(
-            'select count(id) as people_count from \
-            (select id from staff union all select id from fellows)')
+        count = self.db.query('select count(*) as people_count from people')
         return count.all()[0]['people_count']
 
 
@@ -175,9 +161,9 @@ class Fellow(Person):
     def save(self, db):
         """Save a Fellow instance to the database"""
         db.query(
-            "INSERT INTO fellows (name, accomodation)\
-             VALUES(:name, :accomodation)",
-            name=self.name, accomodation=self.wants_accomodation
+            "INSERT INTO people (name, type, accomodation)\
+             VALUES(:name, :type, :accomodation)",
+            name=self.name, type='F', accomodation=self.wants_accomodation
         )
 
 
@@ -191,8 +177,9 @@ class Staff(Person):
     def save(self, db):
         """Save a Staff instance to the database"""
         db.query(
-            "INSERT INTO staff (name) VALUES(:name)",
-            name=self.name
+            "INSERT INTO people (name, type, accomodation) \
+            VALUES(:name, :type, :accomodation)",
+            name=self.name, type='S', accomodation='N'
         )
 
 
