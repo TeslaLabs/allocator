@@ -25,9 +25,10 @@ class Facility(object):
         """
         self.db.query("""
             CREATE TABLE IF NOT EXISTS "rooms" (
-                "id"   integer PRIMARY KEY AUTOINCREMENT,
-                "name" text UNIQUE,
-                "type" text
+                "id"        integer PRIMARY KEY AUTOINCREMENT,
+                "name"      text UNIQUE,
+                "type"      text,
+                "capacity"  integer
             );
             """)
         self.db.query("""
@@ -241,8 +242,9 @@ class LivingSpace(Room):
     def save(self, db):
         """Save a LivingSpace instance to the database"""
         db.query(
-            "INSERT INTO rooms (name, type) VALUES(:name, :type)",
-            name=self.name, type='L'
+            "INSERT INTO rooms (name, type, capacity) \
+            VALUES(:name, :type, :capacity)",
+            name=self.name, type='L', capacity=self.capacity
         )
 
 
@@ -257,6 +259,7 @@ class Office(Room):
     def save(self, db):
         """Save an Office instance to the database"""
         db.query(
-            "INSERT INTO rooms (name, type) VALUES(:name, :type)",
-            name=self.name, type='O'
+            "INSERT INTO rooms (name, type, capacity) \
+            VALUES(:name, :type, :capacity)",
+            name=self.name, type='O', capacity=self.capacity
         )
