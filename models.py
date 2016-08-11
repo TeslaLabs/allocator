@@ -1,15 +1,61 @@
 from __future__ import print_function
 
+from abc import ABCMeta, abstractmethod
+
+import records
 from builtins import super
 
 
 class Facility(object):
-    """ Represents a Facility that houses Fellows and Staff e.g. Amity"""
+    """ Represents a Facility that houses Fellows and Staff e.g. Amity
+
+        This facility is responsible for managing all other instances
+        i.e. Rooms and People
+    """
 
     def __init__(self, name):
         self.name = name
-        self.rooms = []
-        self.people = []
+        self.db = records.Database('sqlite:///{}.db'.format(self.name))
+        self.intialize_db()
+
+    def intialize_db(self):
+        """
+        Create the database tables if they do not exist
+        """
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "rooms" (
+                "id"   integer PRIMARY KEY AUTOINCREMENT,
+                "name" text UNIQUE,
+                "type" text
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "fellows" (
+                "id"           integer PRIMARY KEY AUTOINCREMENT,
+                "name"         text,
+                "accomodation" integer
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "staff" (
+                "id"   integer PRIMARY KEY AUTOINCREMENT,
+                "name" text
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "fellows_rooms" (
+                "id"        integer PRIMARY KEY AUTOINCREMENT,
+                "fellow_id" integer NOT NULL REFERENCES "fellows" ("id"),
+                "room_id"   integer NOT NULL REFERENCES "rooms" ("id")
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "staff_rooms" (
+                "id"       integer PRIMARY KEY AUTOINCREMENT,
+                "staff_id" integer NOT NULL REFERENCES "staff" ("id"),
+                "room_id"  integer NOT NULL REFERENCES "rooms" ("id")
+            );
+            """)
 
     def create_rooms(self, room_type, rooms):
         """ Creates Rooms in a Facility
