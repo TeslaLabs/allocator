@@ -27,7 +27,13 @@ class FacilityTest(unittest.TestCase):
         self.test_facility.create_rooms('office', ['one', 'two'])
         self.assertEqual(2, self.test_facility.rooms)
 
-    def test_add_person(self):
+    def test_add_fellow(self):
+        self.test_facility.add_fellows(['jesse', 'walter', 'tuco'], 'y')
+        self.assertEqual(3, self.test_facility.people)
+
+    def test_add_staff(self):
+        self.test_facility.add_staff(['hank', 'marie', 'wj'])
+        self.assertEqual(3, self.test_facility.people)
         pass
 
     def test_reallocate_person(self):

@@ -34,7 +34,7 @@ class Facility(object):
             CREATE TABLE IF NOT EXISTS "fellows" (
                 "id"           integer PRIMARY KEY AUTOINCREMENT,
                 "name"         text,
-                "accomodation" integer
+                "accomodation" text
             );
             """)
         self.db.query("""
@@ -83,12 +83,25 @@ class Facility(object):
                 room_instance = Office(room_name)
             room_instance.save(self.db)
 
-    def add_person(self, person):
-        """ Add a person to a Facility
+    def add_fellows(self, fellows, accomodation):
+        """ Add a fellow to a Facility
 
-            Once a person is added, they can be allocated a Room
+            Once a fellow is added, they can be allocated a Room
         """
-        self.people.append(person)
+        wants_accomodation = 'Y' if accomodation.lower() == 'y' else 'N'
+
+        for name in fellows:
+            fellow_instance = Fellow(name, wants_accomodation)
+            fellow_instance.save(self.db)
+
+    def add_staff(self, staff):
+        """ Add staff members to a Facility
+
+            Once a staff member is added, they can be allocated a Room
+        """
+        for name in staff:
+            staff_instance = Staff(name)
+            staff_instance.save(self.db)
 
     def reallocate_person(self, person, new_room):
         """ Reallocate the specified person to the specified room_name. """
@@ -116,6 +129,14 @@ class Facility(object):
         count = self.db.query('select count(*) as room_count from rooms')
         return count.all()[0]['room_count']
 
+    @property
+    def people(self):
+        """Get the number of people in a facility"""
+        count = self.db.query(
+            'select count(id) as people_count from \
+            (select id from staff union all select id from fellows)')
+        return count.all()[0]['people_count']
+
 
 class Person(object):
     """ Represents a Person in a Facility
@@ -123,6 +144,8 @@ class Person(object):
         Attributes:
             name: Name of the Person
     """
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, name):
         self.name = name
@@ -134,6 +157,11 @@ class Person(object):
         """
         return self.role
 
+    @abstractmethod
+    def save(self, db):
+        """Save a Person instance to the database"""
+        pass
+
 
 class Fellow(Person):
     """ Represents a Fellow at a Facility """
@@ -143,6 +171,14 @@ class Fellow(Person):
         self.wants_accomodation = wants_accomodation
         self.role = 'Fellow'
 
+    def save(self, db):
+        """Save a Fellow instance to the database"""
+        db.query(
+            "INSERT INTO fellows (name, accomodation)\
+             VALUES(:name, :accomodation)",
+            name=self.name, accomodation=self.wants_accomodation
+        )
+
 
 class Staff(Person):
     """ Represents a Staff Member at a Facility """
@@ -150,6 +186,13 @@ class Staff(Person):
     def __init__(self, name):
         super().__init__(name)
         self.role = 'Staff'
+
+    def save(self, db):
+        """Save a Staff instance to the database"""
+        db.query(
+            "INSERT INTO staff (name) VALUES(:name)",
+            name=self.name
+        )
 
 
 class Room(object):
@@ -159,15 +202,16 @@ class Room(object):
 
     def __init__(self, name):
         self.name = name
-        self.occupants = []
         self.capacity = None
 
     def add_person(self, person):
         """Add a person to a room"""
         # Check if the person is an instance of the Person class
         # and if the room has a vacancy, then allocate
-        if isinstance(person, Person) and has_vacancy(self):
-            self.occupants.append(person)
+        # TODO: Perform SQL Query
+        # if isinstance(person, Person) and has_vacancy(self):
+        #     self.occupants.append(person)
+        pass
 
     @abstractmethod
     def save(self):
