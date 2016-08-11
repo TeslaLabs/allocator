@@ -4,6 +4,7 @@ import os
 from abc import ABCMeta, abstractmethod
 
 import records
+from sqlalchemy.exc import IntegrityError
 from builtins import super
 
 
@@ -98,13 +99,53 @@ class Facility(object):
 
     def load_people(self, file_path):
         """ Add people to rooms from the provided file """
-        pass
+        fellows = []
+        staff = []
 
-    def print_allocations(self, ):
+        with open(file_path, 'r') as people_file:
+            # self.db.query('PRAGMA busy_timeout = 30000')
+            for line in people_file:
+                if 'FELLOW' in line:
+                    fellow_data = [chunk.strip()
+                                   for chunk in line.split('FELLOW')]
+                    # Temporarily save fellow data in a list
+                    fellows.append((fellow_data[0], fellow_data[1]))
+                elif 'STAFF' in line:
+                    staff_data = [chunk.strip()
+                                  for chunk in line.split('STAFF')]
+                    # Temporarily save all instances in a list
+                    staff.append(staff_data[0])
+                else:
+                    raise ValueError('Invalid Input File!')
+
+        # Persist the people data to the DB
+        for (name, accomodation) in fellows:
+            fellow_instance = Fellow(name, accomodation)
+            try:
+                fellow_instance.save(self.db)
+            # Duplicate item error
+            except IntegrityError:
+                pass
+        for member in staff:
+            staff_instance = Staff(member)
+            try:
+                staff_instance.save(self.db)
+            except IntegrityError:
+                pass
+
+        # Get available rooms
+        print(fellows)
+        print(staff)
+        rooms = self.available_rooms()
+        # TODO: Get newly-created people instances
+        # TODO: Assign these people to rooms
+        print(rooms)
+
+    def print_allocations(self):
         """ Print a list of allocations onto the screen """
         pass
 
-    def print_unallocated(self, ):
+    def print_unallocated(self):
         """ Print a list of unallocated people to the screen """
         pass
 
@@ -117,6 +158,25 @@ class Facility(object):
         """Get the number of rooms in a facility"""
         count = self.db.query('select count(*) as room_count from rooms')
         return count.all()[0]['room_count']
+
+    def available_rooms(self):
+        """Get the number of available rooms in a facility"""
+        rooms = []
+
+        all_rooms = self.db.query('select * from rooms', fetchall=True)
+        for room in all_rooms.as_dict():
+            room_count = self.db.query('select count(id) as room_count \
+                from people_rooms where room_id={}'.format(
+                room['id']), fetchall=True).as_dict()[0]['room_count']
+
+            rooms.append({
+                'name': room['name'],
+                'type': room['type'],
+                'capacity': room['capacity'],
+                'available_space': room['capacity'] - room_count
+            })
+
+        return rooms
 
     @property
     def people(self):
@@ -191,15 +251,6 @@ class Room(object):
     def __init__(self, name):
         self.name = name
         self.capacity = None
-
-    def add_person(self, person):
-        """Add a person to a room"""
-        # Check if the person is an instance of the Person class
-        # and if the room has a vacancy, then allocate
-        # TODO: Perform SQL Query
-        # if isinstance(person, Person) and has_vacancy(self):
-        #     self.occupants.append(person)
-        pass
 
     @abstractmethod
     def save(self):

@@ -48,3 +48,5 @@ if __name__ == '__main__':
         amity.add_fellows(args['<fellow_name>'], args['--accomodation'])
     elif args['add_staff']:
         amity.add_staff(args['<staff_name>'])
+    elif args['load_people']:
+        amity.load_people(args['<people_input_file>'])
