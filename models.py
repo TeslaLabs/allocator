@@ -1,15 +1,70 @@
 from __future__ import print_function
 
+import os
+from abc import ABCMeta, abstractmethod
+
+import records
 from builtins import super
 
 
 class Facility(object):
-    """ Represents a Facility that houses Fellows and Staff e.g. Amity"""
+    """ Represents a Facility that houses Fellows and Staff e.g. Amity
+
+        This facility is responsible for managing all other instances
+        i.e. Rooms and People
+    """
 
     def __init__(self, name):
         self.name = name
-        self.rooms = []
-        self.people = []
+        self.db = records.Database('sqlite:///{}.db'.format(self.name))
+        self.intialize_db()
+
+    def intialize_db(self):
+        """
+        Create the database tables if they do not exist
+        """
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "rooms" (
+                "id"   integer PRIMARY KEY AUTOINCREMENT,
+                "name" text UNIQUE,
+                "type" text
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "fellows" (
+                "id"           integer PRIMARY KEY AUTOINCREMENT,
+                "name"         text,
+                "accomodation" integer
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "staff" (
+                "id"   integer PRIMARY KEY AUTOINCREMENT,
+                "name" text
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "fellows_rooms" (
+                "id"        integer PRIMARY KEY AUTOINCREMENT,
+                "fellow_id" integer NOT NULL REFERENCES "fellows" ("id"),
+                "room_id"   integer NOT NULL REFERENCES "rooms" ("id")
+            );
+            """)
+        self.db.query("""
+            CREATE TABLE IF NOT EXISTS "staff_rooms" (
+                "id"       integer PRIMARY KEY AUTOINCREMENT,
+                "staff_id" integer NOT NULL REFERENCES "staff" ("id"),
+                "room_id"  integer NOT NULL REFERENCES "rooms" ("id")
+            );
+            """)
+
+    def drop_db(self):
+        """
+        Deletes the database tables if it exists
+        """
+        db_name = self.db.db_url.split('///')[1]
+        if os.path.exists(db_name):
+            os.remove(db_name)
 
     def create_rooms(self, room_type, rooms):
         """ Creates Rooms in a Facility
@@ -24,10 +79,9 @@ class Facility(object):
         for room_name in rooms:
             if room_type == 'living_space':
                 room_instance = LivingSpace(room_name)
-                self.rooms.append(room_instance)
             elif room_type == 'office':
                 room_instance = Office(room_name)
-                self.rooms.append(room_instance)
+            room_instance.save(self.db)
 
     def add_person(self, person):
         """ Add a person to a Facility
@@ -56,13 +110,11 @@ class Facility(object):
         """" Print the names of all the people in room_name on the screen """
         pass
 
-    def save_state(self, db_name):
-        """ Persist all the data stored in the app to a SQLite database """
-        pass
-
-    def load_state(self, db_name):
-        """ Load data from a database into the application """
-        pass
+    @property
+    def rooms(self):
+        """Get the number of rooms in a facility"""
+        count = self.db.query('select count(*) as room_count from rooms')
+        return count.all()[0]['room_count']
 
 
 class Person(object):
@@ -103,6 +155,8 @@ class Staff(Person):
 class Room(object):
     """Represents a Room at a Facility"""
 
+    __metaclass__ = ABCMeta
+
     def __init__(self, name):
         self.name = name
         self.occupants = []
@@ -114,6 +168,11 @@ class Room(object):
         # and if the room has a vacancy, then allocate
         if isinstance(person, Person) and has_vacancy(self):
             self.occupants.append(person)
+
+    @abstractmethod
+    def save(self):
+        """Save a Room instance to the database"""
+        pass
 
     def print_occupants(self):
         """Print the names of all the people in this room."""
@@ -135,6 +194,13 @@ class LivingSpace(Room):
         # Living spaces have a capacity of 4 fellows
         self.capacity = 4
 
+    def save(self, db):
+        """Save a LivingSpace instance to the database"""
+        db.query(
+            "INSERT INTO rooms (name, type) VALUES(:name, :type)",
+            name=self.name, type='L'
+        )
+
 
 class Office(Room):
     """Represents an office in a Facility"""
@@ -143,3 +209,10 @@ class Office(Room):
         super().__init__(name)
         # Offices have a capacity of 6 people
         self.capacity = 6
+
+    def save(self, db):
+        """Save an Office instance to the database"""
+        db.query(
+            "INSERT INTO rooms (name, type) VALUES(:name, :type)",
+            name=self.name, type='O'
+        )

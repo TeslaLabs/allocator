@@ -8,24 +8,24 @@ class FacilityTest(unittest.TestCase):
 
     def setUp(self):
         self.test_facility = models.Facility('Test-Amity')
-        pass
 
     def tearDown(self):
-        pass
+        self.test_facility.drop_db()
 
     def test_create_facility(self):
-        self.assertEqual('Test-Amity', self.test_facility.name)
-        self.assertEqual(0, len(self.test_facility.people))
-        self.assertEqual(0, len(self.test_facility.rooms))
-        pass
+        self.assertEqual(self.test_facility.name, 'Test-Amity')
+        self.assertEqual(
+            self.test_facility.db.db_url,
+            'sqlite:///{}.db'.format(self.test_facility.name)
+        )
 
     def test_create_living_space(self):
         self.test_facility.create_rooms('living_space', ['one', 'two'])
-        self.assertEqual(2, len(self.test_facility.rooms))
+        self.assertEqual(2, self.test_facility.rooms)
 
     def test_create_office(self):
         self.test_facility.create_rooms('office', ['one', 'two'])
-        self.assertEqual(2, len(self.test_facility.rooms))
+        self.assertEqual(2, self.test_facility.rooms)
 
     def test_add_person(self):
         pass
