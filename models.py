@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import os
 from abc import ABCMeta, abstractmethod
 
 import records
@@ -56,6 +57,14 @@ class Facility(object):
                 "room_id"  integer NOT NULL REFERENCES "rooms" ("id")
             );
             """)
+
+    def drop_db(self):
+        """
+        Deletes the database tables if it exists
+        """
+        db_name = self.db.db_url.split('///')[1]
+        if os.path.exists(db_name):
+            os.remove(db_name)
 
     def create_rooms(self, room_type, rooms):
         """ Creates Rooms in a Facility

@@ -8,10 +8,9 @@ class FacilityTest(unittest.TestCase):
 
     def setUp(self):
         self.test_facility = models.Facility('Test-Amity')
-        pass
 
     def tearDown(self):
-        pass
+        self.test_facility.drop_db()
 
     def test_create_facility(self):
         self.assertEqual('Test-Amity', self.test_facility.name)
