@@ -73,3 +73,6 @@ target/
 
 # dotenv
 .env
+
+# Sqlite Databases
+*.db
