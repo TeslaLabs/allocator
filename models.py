@@ -69,12 +69,12 @@ class Facility(BaseModel):
                     # The room already exists
                     pass
 
-    def add_fellows(self, fellows, accomodation):
+    def add_fellows(self, fellows, accomodation='N'):
         """ Add a fellow to a Facility
 
             Once a fellow is added, they can be allocated a Room
         """
-        wants_accomodation = 'Y' if accomodation.lower() == 'y' else 'N'
+        wants_accomodation = 'Y' if accomodation[0].lower() == 'y' else 'N'
 
         for name in fellows:
             try:
