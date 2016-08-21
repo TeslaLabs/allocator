@@ -26,7 +26,9 @@ class Facility(BaseModel):
 
     def __init__(self, name):
         self.name = name
+        self.initialize_db()
 
+    def initialize_db(self):
         # Connect to the database
         db.connect()
         # Create the necessary DB tables
