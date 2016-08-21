@@ -34,7 +34,6 @@ class FacilityTest(unittest.TestCase):
     def test_add_staff(self):
         self.test_facility.add_staff(['hank', 'marie', 'wj'])
         self.assertEqual(3, self.test_facility.people)
-        pass
 
     def test_reallocate_person(self):
         pass
