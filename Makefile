@@ -7,4 +7,4 @@ test:
 lint:
 	pep8 --ignore=E501 .
 
-.PHONY: install lint test
+.PHONY: lint test install
