@@ -209,7 +209,15 @@ class Room(BaseModel):
 
     name = CharField(unique=True)
     room_type = CharField()
-    capacity = IntegerField()
+
+    @property
+    def capacity(self):
+        if self.room_type == 'Office':
+            return 6
+        elif self.room_type == 'Living Space':
+            return 4
+        else:
+            return None
 
     def print_occupants(self):
         """Print the names of all the people in this room."""
