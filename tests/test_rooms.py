@@ -10,9 +10,7 @@ class RoomTest(unittest.TestCase):
     """ Tests for the Room Class """
 
     def setUp(self):
-        self.room_name = 'room_one'
         self.test_facility = models.Facility('Test-Amity')
-        self.office = models.Room.create(name=self.room_name, room_type='Office')
 
     def tearDown(self):
         self.test_facility.drop_db()
@@ -29,8 +27,6 @@ class LivingSpaceTest(unittest.TestCase):
 
     def setUp(self):
         self.test_facility = models.Facility('Test-Amity')
-        self.living_space = models.Room.create(room_type='Living Space')
-        self.fellow = models.Room.create(room_type='Living Space')
 
     def tearDown(self):
         self.test_facility.drop_db()
@@ -53,7 +49,6 @@ class OfficeTest(unittest.TestCase):
 
     def setUp(self):
         self.test_facility = models.Facility('Test-Amity')
-        self.office = models.Room.create(room_type='Office')
 
     def tearDown(self):
         self.test_facility.drop_db()
