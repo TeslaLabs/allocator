@@ -2,6 +2,8 @@ import unittest
 
 from .context import models
 
+print(__name__)
+
 
 class FacilityTest(unittest.TestCase):
     """ Tests for the Facility Class """
@@ -14,10 +16,6 @@ class FacilityTest(unittest.TestCase):
 
     def test_create_facility(self):
         self.assertEqual(self.test_facility.name, 'Test-Amity')
-        self.assertEqual(
-            self.test_facility.db.db_url,
-            'sqlite:///{}.db'.format(self.test_facility.name)
-        )
 
     def test_create_living_space(self):
         self.test_facility.create_rooms('living_space', ['one', 'two'])
