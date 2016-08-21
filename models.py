@@ -7,10 +7,8 @@ from dotenv import load_dotenv
 from sqlalchemy.exc import IntegrityError
 from peewee import *
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path)
 
-DB_NAME = os.environ.get('DB_NAME')
+DB_NAME = os.environ.get('DB_NAME', 'Amity.db')
 db = SqliteDatabase(DB_NAME)
 
 
