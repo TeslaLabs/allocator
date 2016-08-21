@@ -1,4 +1,7 @@
 import unittest
+import pytest
+
+from peewee import *
 
 from .context import models
 
@@ -7,13 +10,12 @@ class RoomTest(unittest.TestCase):
     """ Tests for the Room Class """
 
     def setUp(self):
-        pass
+        self.room_name = 'room_one'
+        self.test_facility = models.Facility('Test-Amity')
+        self.office = models.Room.create(name=self.room_name, room_type='Office')
 
     def tearDown(self):
-        pass
-
-    def test_add_person(self):
-        pass
+        self.test_facility.drop_db()
 
     def test_print_occupants(self):
         pass
@@ -26,12 +28,23 @@ class LivingSpaceTest(unittest.TestCase):
     """ Tests for the LivingSpace Class """
 
     def setUp(self):
-        pass
+        self.test_facility = models.Facility('Test-Amity')
+        self.living_space = models.Room.create(room_type='Living Space')
+        self.fellow = models.Room.create(room_type='Living Space')
 
     def tearDown(self):
+        self.test_facility.drop_db()
+
+    def test_add_fellow_to_living_space(self):
         pass
 
-    def test_has_vacancy(self):
+    def test_living_space_is_created_with_correct_capacity(self):
+        pass
+
+    def test_should_not_add_person_to_filled_living_space(self):
+        pass
+
+    def test_should_not_add_staff_to_living_space(self):
         pass
 
 
@@ -39,14 +52,20 @@ class OfficeTest(unittest.TestCase):
     """ Tests for the Office Class """
 
     def setUp(self):
-        pass
+        self.test_facility = models.Facility('Test-Amity')
+        self.office = models.Room.create(room_type='Office')
 
     def tearDown(self):
+        self.test_facility.drop_db()
+
+    def test_add_person_to_office(self):
         pass
 
-    def test_has_vacancy(self):
+    def test_office_is_created_with_correct_capacity(self):
         pass
 
+    def test_should_not_add_person_to_filled_office(self):
+        pass
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_should_add_fellow_if_they_already_have_a_living_space(self):
+        pass
