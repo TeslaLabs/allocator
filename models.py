@@ -58,13 +58,13 @@ class Facility(BaseModel):
         for room_name in rooms:
             if room_type == 'living_space':
                 try:
-                    Room.create(name=room_name, room_type='L', capacity=4)
+                    Room.create(name=room_name, room_type='Living Space')
                 except IntegrityError:
                     # The room already exists
                     pass
             elif room_type == 'office':
                 try:
-                    Room.create(name=room_name, room_type='O', capacity=6)
+                    Room.create(name=room_name, room_type='Office')
                 except IntegrityError:
                     # The room already exists
                     pass
