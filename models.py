@@ -125,21 +125,22 @@ class Facility(object):
                 fellow_instance.save(self.db)
             # Duplicate item error
             except IntegrityError:
-                pass
+                # The fellow already exists in the DB
+                fellows.remove((name, accomodation))
         for member in staff:
             staff_instance = Staff(member)
             try:
                 staff_instance.save(self.db)
             except IntegrityError:
-                pass
+                staff.remove(member)
 
         # Get available rooms
-        print(fellows)
-        print(staff)
+        print('FELLOWS:', fellows)
+        print('STAFF:', staff)
         rooms = self.available_rooms()
         # TODO: Get newly-created people instances
         # TODO: Assign these people to rooms
-        print(rooms)
+        print('ROOMS:', rooms)
 
     def print_allocations(self):
         """ Print a list of allocations onto the screen """
@@ -164,10 +165,10 @@ class Facility(object):
         rooms = []
 
         all_rooms = self.db.query('select * from rooms', fetchall=True)
-        for room in all_rooms.as_dict():
+        for room in all_rooms.all():
             room_count = self.db.query('select count(id) as room_count \
                 from people_rooms where room_id={}'.format(
-                room['id']), fetchall=True).as_dict()[0]['room_count']
+                room['id']), fetchall=True).all()[0]['room_count']
 
             rooms.append({
                 'name': room['name'],
