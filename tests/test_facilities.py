@@ -16,6 +16,10 @@ class FacilityTest(unittest.TestCase):
     def test_create_facility(self):
         assert self.test_facility.name == 'Test-Amity'
 
+    def test_available_rooms(self):
+        room = models.Room.create(name='Go', room_type='Living Space')
+        self.assertListEqual([room for room in models.Room.select()], self.test_facility.available_rooms())
+
     def test_create_facility_should_call_initialize_database(self):
         pass
 
