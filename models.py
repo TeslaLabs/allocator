@@ -242,3 +242,4 @@ class PeopleRooms(BaseModel):
 
     class Meta:
         db_table = 'people_rooms'
+        primary_key = CompositeKey('person', 'room')
