@@ -18,3 +18,6 @@ class FacilityTest(unittest.TestCase):
 
     def test_create_facility_should_call_initialize_database(self):
         pass
+
+    def test_print_room_calls_instance_method_print_occupants(self):
+        pass

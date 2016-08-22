@@ -180,24 +180,9 @@ class Facility(BaseModel):
         """Return the names of people in a facility"""
         return [person.name for person in Person.select()]
 
-    # def available_rooms(self):
-    #     """Get the number of available rooms in a facility"""
-    #     rooms = []
-    #
-    #     all_rooms = self.db.query('select * from rooms', fetchall=True)
-    #     for room in all_rooms.all():
-    #         room_count = self.db.query('select count(id) as room_count \
-    #             from people_rooms where room_id={}'.format(
-    #             room['id']), fetchall=True).all()[0]['room_count']
-    #
-    #         rooms.append({
-    #             'name': room['name'],
-    #             'type': room['type'],
-    #             'capacity': room['capacity'],
-    #             'available_space': room['capacity'] - room_count
-    #         })
-    #
-    #     return rooms
+    def available_rooms(self):
+        """Return a list of the available rooms in a facility"""
+        return [room for room in Room.select() if room.has_vacancy()]
 
 
 class Person(BaseModel):
@@ -228,21 +213,33 @@ class Room(BaseModel):
             return 6
         elif self.room_type == 'Living Space':
             return 4
-        else:
-            return None
+
+    @property
+    def occupants(self):
+        """Return the names of occupants in a room"""
+        return [person.name for person in self.people]
 
     def print_occupants(self):
         """Print the names of all the people in this room."""
-        # for num, member in enumerate(self.occupants, start=1):
-        #     print(num, member.name)
-        pass
+        if len(self.occupants) == 0:
+            print('Room has no occupants')
+        for num, member in enumerate(self.occupants, start=1):
+            print('{}. {}'.format(num, member))
+
+    def add_occupant(self, occupant):
+        """Add an occupant to a room"""
+        if self.room_type == 'Living Space' and occupant.role == 'Staff':
+            raise Exception('Cannot add a Staff Member to a Living Space')
+        elif not self.has_vacancy():
+            # If the room has no vacancy, raise an error
+            raise Exception('Room is fully occupied')
+        self.people.add(occupant)
 
     def has_vacancy(self):
         """
         Return True if this Room has an available slot or False otherwise.
         """
-        # return len(self.occupants) < self.capacity
-        pass
+        return len(self.occupants) < self.capacity
 
     class Meta:
         db_table = 'rooms'
