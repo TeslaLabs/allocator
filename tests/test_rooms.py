@@ -46,6 +46,11 @@ class LivingSpaceTest(unittest.TestCase):
         created_rooms = [room.room_type for room in models.Room.select()]
         self.assertListEqual(['Living Space', 'Living Space'], created_rooms)
 
+    def test_creates_living_space_with_correct_capacity(self):
+        self.test_facility.create_rooms('living_space', ['one'])
+        for room in models.Room.select():
+            assert room.capacity == 4
+
     def test_add_fellow_to_living_space(self):
         pass
 
@@ -71,6 +76,11 @@ class OfficeTest(unittest.TestCase):
     def test_create_office(self):
         self.test_facility.create_rooms('office', ['one', 'two'])
         assert self.test_facility.room_count == 2
+
+    def test_creates_office_with_correct_capacity(self):
+        self.test_facility.create_rooms('office', ['one', 'two'])
+        for room in models.Room.select():
+            assert room.capacity == 6
 
     def test_create_office_creates_correct_room_type(self):
         self.test_facility.create_rooms('office', ['one', 'two'])
