@@ -14,13 +14,11 @@ Usage:
   allocator.py print_unallocated [--output-unallocated=unallocated.txt]
   allocator.py print_room <room_name>
   allocator.py load_people <people_input_file>
-  allocator.py (-i | --interactive)
   allocator.py (-h | --help)
   allocator.py --version
 
 Options:
   -h, --help                      Show this screen and exit
-  -i, --interactive               Interactive Mode
   -a, --accomodation=<Y|N>        Wants accomodation [default: N]
   -oa, --output-allocations FILE  Specify output file [default: ./allocations.txt]
   -ou, --output-unallocated FILE  Specify output file [default: ./unallocated.txt]
