@@ -3,9 +3,8 @@ from __future__ import print_function
 import os
 
 from builtins import super
-from dotenv import load_dotenv
-from sqlalchemy.exc import IntegrityError
 from peewee import *
+from playhouse.fields import ManyToManyField
 
 
 DB_NAME = os.environ.get('DB_NAME', 'Amity.db')
@@ -33,7 +32,7 @@ class Facility(BaseModel):
         db.connect()
         # Create the necessary DB tables
         try:
-            db.create_tables([Room, Person, PeopleRooms])
+            db.create_tables([Room, Person, Room.people.get_through_model()])
         except OperationalError:
             # table already exists
             pass
@@ -209,6 +208,7 @@ class Room(BaseModel):
 
     name = CharField(unique=True)
     room_type = CharField()
+    people = ManyToManyField(Person)
 
     @property
     def capacity(self):
@@ -234,12 +234,3 @@ class Room(BaseModel):
 
     class Meta:
         db_table = 'rooms'
-
-
-class PeopleRooms(BaseModel):
-    person = ForeignKeyField(db_column='person_id', rel_model=Person)
-    room = ForeignKeyField(db_column='room_id', rel_model=Room)
-
-    class Meta:
-        db_table = 'people_rooms'
-        primary_key = CompositeKey('person', 'room')
