@@ -1,6 +1,7 @@
 import unittest
 
 from faker import Factory
+from peewee import IntegrityError
 
 from .context import models
 
@@ -16,6 +17,24 @@ class RoomTest(unittest.TestCase):
 
     def tearDown(self):
         self.test_facility.drop_db()
+
+    def test_create_office(self):
+        self.test_facility.create_rooms('office', ['one', 'two'])
+        assert self.test_facility.room_count == 2
+
+    def test_create_living_space(self):
+        self.test_facility.create_rooms('living_space', ['one', 'two'])
+        assert self.test_facility.room_count == 2
+
+    def test_should_not_create_duplicate_office(self):
+        self.test_facility.create_rooms('office', ['one'])
+        self.test_facility.create_rooms('office', ['one'])
+        self.assertEqual(self.test_facility.room_count, 1)
+
+    def test_should_not_create_duplicate_living_space(self):
+        self.test_facility.create_rooms('living_space', ['one'])
+        self.test_facility.create_rooms('living_space', ['one'])
+        self.assertEqual(self.test_facility.room_count, 1)
 
     def test_should_not_create_invalid_room(self):
         with self.assertRaises(ValueError):
@@ -83,10 +102,6 @@ class LivingSpaceTest(unittest.TestCase):
     def tearDown(self):
         self.test_facility.drop_db()
 
-    def test_create_living_space(self):
-        self.test_facility.create_rooms('living_space', ['one', 'two'])
-        assert self.test_facility.room_count == 2
-
     def test_create_living_space_creates_correct_room_type(self):
         self.test_facility.create_rooms('living_space', ['one', 'two'])
         created_rooms = [room.room_type for room in models.Room.select()]
@@ -113,10 +128,6 @@ class OfficeTest(unittest.TestCase):
 
     def tearDown(self):
         self.test_facility.drop_db()
-
-    def test_create_office(self):
-        self.test_facility.create_rooms('office', ['one', 'two'])
-        assert self.test_facility.room_count == 2
 
     def test_creates_office_with_correct_capacity(self):
         self.test_facility.create_rooms('office', ['one', 'two'])
