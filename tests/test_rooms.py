@@ -1,8 +1,12 @@
 import unittest
 
 from peewee import *
+from faker import Factory
 
 from .context import models
+
+
+fake = Factory.create()
 
 
 class RoomTest(unittest.TestCase):
@@ -18,11 +22,23 @@ class RoomTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.test_facility.create_rooms('bleh bleh', ['one', 'two'])
 
-    def test_print_room_calls_instance_mehtod_print_occupants(self):
+    def test_add_occupants_to_room(self):
+        room = models.Room.create(name='Go', room_type='Living Space')
+        fellow = models.Person.create(name=fake.name(), accomodation='N', role='Fellow')
+        staff = models.Person.create(name=fake.name(), accomodation='N', role='Fellow')
+        room.add_occupants(fellow, staff)
+        # The added people should be in the occupants list
+        self.assertIn(fellow.name, room.occupants)
+        self.assertIn(staff.name, room.occupants)
+
+    def test_should_not_add_occupants_if_room_is_full(self):
         pass
 
     def test_print_occupants(self):
-        pass
+        room = models.Room.create(name='Go', room_type='Living Space')
+        fellow = models.Person.create(name='Kevin', accomodation='N', role='Fellow')
+        staff = models.Person.create(name='Staff Name', accomodation='N', role='Staff')
+        room.people.add([fellow, staff])
 
     def test_has_vacancy(self):
         pass
@@ -51,16 +67,13 @@ class LivingSpaceTest(unittest.TestCase):
         for room in models.Room.select():
             assert room.capacity == 4
 
-    def test_add_fellow_to_living_space(self):
-        pass
+    def test_should_not_add_staff_to_living_space(self):
+        room = models.Room.create(name='Go', room_type='Living Space')
+        staff = models.Person.create(name=fake.name(), accomodation='N', role='Staff')
+        with self.assertRaises(Exception):
+            room.add_occupants(staff)
 
     def test_living_space_is_created_with_correct_capacity(self):
-        pass
-
-    def test_should_not_add_person_to_filled_living_space(self):
-        pass
-
-    def test_should_not_add_staff_to_living_space(self):
         pass
 
 
@@ -86,9 +99,6 @@ class OfficeTest(unittest.TestCase):
         self.test_facility.create_rooms('office', ['one', 'two'])
         created_rooms = [room.room_type for room in models.Room.select()]
         self.assertListEqual(['Office', 'Office'], created_rooms)
-
-    def test_add_person_to_office(self):
-        pass
 
     def test_office_is_created_with_correct_capacity(self):
         pass

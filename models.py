@@ -226,14 +226,15 @@ class Room(BaseModel):
         for num, member in enumerate(self.occupants, start=1):
             print('{}. {}'.format(num, member))
 
-    def add_occupant(self, occupant):
+    def add_occupants(self, *occupants):
         """Add an occupant to a room"""
-        if self.room_type == 'Living Space' and occupant.role == 'Staff':
-            raise Exception('Cannot add a Staff Member to a Living Space')
-        elif not self.has_vacancy():
+        if not self.has_vacancy():
             # If the room has no vacancy, raise an error
             raise Exception('Room is fully occupied')
-        self.people.add(occupant)
+        for occupant in occupants:
+            if self.room_type == 'Living Space' and occupant.role == 'Staff':
+                raise Exception('Cannot add a Staff Member to a Living Space')
+            self.people.add(occupant)
 
     def has_vacancy(self):
         """
