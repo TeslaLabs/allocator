@@ -33,7 +33,7 @@ class Facility(BaseModel):
         db.connect()
         # Create the necessary DB tables
         try:
-            db.create_tables([Room, Person])
+            db.create_tables([Room, Person, PeopleRooms])
         except OperationalError:
             # table already exists
             pass
