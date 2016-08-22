@@ -68,6 +68,7 @@ class Facility(BaseModel):
                     # The room already exists
                     pass
 
+    # TODO: Allocate room after adding a fellow
     def add_fellows(self, fellows, accomodation='N'):
         """ Add a fellow to a Facility
 
@@ -85,6 +86,7 @@ class Facility(BaseModel):
                 # The person already exists
                 pass
 
+    # TODO: Allocate room after adding a staff member
     def add_staff(self, staff):
         """ Add staff members to a Facility
 
@@ -159,14 +161,24 @@ class Facility(BaseModel):
         pass
 
     @property
-    def rooms(self):
+    def room_count(self):
         """Get the number of rooms in a facility"""
         return Room.select().count()
 
     @property
-    def people(self):
+    def rooms(self):
+        """Get the names of rooms in a facility"""
+        return [room.name for room in Room.select()]
+
+    @property
+    def people_count(self):
         """Get the number of people in a facility"""
         return Person.select().count()
+
+    @property
+    def people(self):
+        """Return the names of people in a facility"""
+        return [person.name for person in Person.select()]
 
     # def available_rooms(self):
     #     """Get the number of available rooms in a facility"""
