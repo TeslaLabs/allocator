@@ -81,7 +81,6 @@ class Facility(BaseModel):
 
             Once a fellow is added, they can be allocated a Room
         """
-        print('accomodation: ', accomodation)
         wants_accomodation = 'Y' if accomodation[0].lower() == 'y' else 'N'
 
         for name in fellows:
@@ -122,54 +121,26 @@ class Facility(BaseModel):
                 # The person already exists
                 pass
 
-    def reallocate_person(self, person, new_room):
+    def reallocate_person(self, person, room_name):
         """ Reallocate the specified person to the specified room_name. """
         pass
 
-    # def load_people(self, file_path):
-    #     """ Add people to rooms from the provided file """
-    #     fellows = []
-    #     staff = []
-    #
-    #     with open(file_path, 'r') as people_file:
-    #         # self.db.query('PRAGMA busy_timeout = 30000')
-    #         for line in people_file:
-    #             if 'FELLOW' in line:
-    #                 fellow_data = [chunk.strip()
-    #                                for chunk in line.split('FELLOW')]
-    #                 # Temporarily save fellow data in a list
-    #                 fellows.append((fellow_data[0], fellow_data[1]))
-    #             elif 'STAFF' in line:
-    #                 staff_data = [chunk.strip()
-    #                               for chunk in line.split('STAFF')]
-    #                 # Temporarily save all instances in a list
-    #                 staff.append(staff_data[0])
-    #             else:
-    #                 raise ValueError('Invalid Input File!')
-    #
-    #     # Persist the people data to the DB
-    #     for (name, accomodation) in fellows:
-    #         fellow_instance = Fellow(name, accomodation)
-    #         try:
-    #             fellow_instance.save(self.db)
-    #         # Duplicate item error
-    #         except IntegrityError:
-    #             # The fellow already exists in the DB
-    #             pass
-    #     for member in staff:
-    #         staff_instance = Staff(member)
-    #         try:
-    #             staff_instance.save(self.db)
-    #         except IntegrityError:
-    #             pass
-    #
-    #     # Get available rooms
-    #     print('FELLOWS:', fellows)
-    #     print('STAFF:', staff)
-    #     rooms = self.available_rooms()
-    #     # TODO: Get newly-created people instances
-    #     # TODO: Assign these people to rooms
-    #     print('ROOMS:', rooms)
+    def load_people(self, file_path):
+        """ Add people to rooms from the provided file """
+
+        with open(file_path, 'r') as people_file:
+            for line in people_file:
+                if 'FELLOW' in line:
+                    fellow_data = [chunk.strip()
+                                   for chunk in line.split('FELLOW')]
+                    self.add_fellows([fellow_data[0]], fellow_data[1])
+                elif 'STAFF' in line:
+                    staff_data = [chunk.strip()
+                                  for chunk in line.split('STAFF')]
+                    self.add_staff([staff_data[0]])
+                else:
+                    # If a line in the input file is invalid, ignore it
+                    pass
 
     def print_allocations(self):
         """ Print a list of allocations onto the screen """
