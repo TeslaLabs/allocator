@@ -1,4 +1,5 @@
 # Allocator
+[![Build Status](https://travis-ci.org/kevgathuku/allocator.svg?branch=master)](https://travis-ci.org/kevgathuku/allocator)  [![Coverage Status](https://coveralls.io/repos/github/kevgathuku/allocator/badge.svg?branch=master)](https://coveralls.io/github/kevgathuku/allocator?branch=master)
 
 This project implements a room allocation system for one of Andela's facilities called Amity.
 
@@ -22,7 +23,7 @@ This system should automatically allocate spaces to people at random.
 `git clone git@github.com:kevgathuku/allocator.git`
 - Change directory into the newly-created project directory  
 `cd allocator`
-- Create a virtualenv to isolate project dependencies
+- Create a virtualenv to isolate project dependencies  
  `mkvirtualenv allocator`
 - Activate the virtualenv  
 `workon allocator`
