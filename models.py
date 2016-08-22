@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os
+import random
 
 from builtins import super
 from peewee import *
@@ -12,6 +13,7 @@ db = SqliteDatabase(DB_NAME)
 
 
 class BaseModel(Model):
+
     class Meta:
         database = db
 
@@ -41,8 +43,14 @@ class Facility(BaseModel):
         """
         Deletes the database tables if it exists
         """
+        print('Dropping', DB_NAME)
         if os.path.exists(DB_NAME):
             os.remove(DB_NAME)
+
+    def available_rooms(self):
+        """Return a list of the available rooms in a facility"""
+
+        return [room for room in Room.select() if room.has_vacancy()]
 
     def create_rooms(self, room_type, rooms):
         """ Creates Rooms in a Facility
@@ -68,20 +76,31 @@ class Facility(BaseModel):
                     # The room already exists
                     pass
 
-    # TODO: Allocate room after adding a fellow
     def add_fellows(self, fellows, accomodation='N'):
         """ Add a fellow to a Facility
 
             Once a fellow is added, they can be allocated a Room
         """
+        print('accomodation: ', accomodation)
         wants_accomodation = 'Y' if accomodation[0].lower() == 'y' else 'N'
 
         for name in fellows:
             try:
-                Person.create(
+                fellow = Person.create(
                     name=name,
                     accomodation=wants_accomodation,
                     role='Fellow')
+                # Choose a random room to allocate to a fellow
+                # Can be a Living Space or Office
+                if wants_accomodation == 'Y':
+                    room = random.choice(self.available_rooms())
+                    room.add_occupants(fellow)
+                # If no accomodation is chosen, choose an office explicitly
+                elif wants_accomodation == 'N':
+                    room = random.choice([room
+                                          for room in self.available_rooms()
+                                          if room.room_type == 'Office'])
+                    room.add_occupants(fellow)
             except IntegrityError:
                 # The person already exists
                 pass
@@ -179,10 +198,6 @@ class Facility(BaseModel):
     def people(self):
         """Return the names of people in a facility"""
         return [person.name for person in Person.select()]
-
-    def available_rooms(self):
-        """Return a list of the available rooms in a facility"""
-        return [room for room in Room.select() if room.has_vacancy()]
 
 
 class Person(BaseModel):

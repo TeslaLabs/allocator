@@ -1,7 +1,6 @@
 import unittest
 
 from faker import Factory
-from peewee import IntegrityError
 
 from .context import models
 
