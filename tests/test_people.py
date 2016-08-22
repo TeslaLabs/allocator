@@ -65,9 +65,32 @@ class FellowTest(unittest.TestCase):
         for fellow in models.Person.select():
             self.assertEqual(fellow.accomodation, 'N')
 
-    # def test_add_staff(self):
-    #     self.test_facility.add_staff(['hank', 'marie', 'wj'])
-    #     assert self.test_facility.people_count == 3
-    #
-    # def test_should_not_add_person_if_they_already_exist(self):
-    #     pass
+
+class StaffTest(unittest.TestCase):
+    """ Tests for the Staff Related Functionality"""
+
+    def setUp(self):
+        self.test_facility = models.Facility('Test-Amity')
+
+    def tearDown(self):
+        self.test_facility.drop_db()
+
+    def test_add_staff(self):
+        self.test_facility.create_rooms('office', ['one'])
+        self.test_facility.add_staff(['hank', 'marie', 'wj'])
+        assert self.test_facility.people_count == 3
+
+    def test_add_staff_does_not_create_duplicate_staff_members(self):
+        self.test_facility.create_rooms('office', ['owfewfwefwefne'])
+        self.test_facility.add_staff(['hank'])
+        self.test_facility.add_staff(['hank'])
+        # The Duplicate person should not be created
+        self.assertEqual(len(self.test_facility.people), 1)
+
+    def test_add_staff_allocates_room(self):
+        names = ['jesse', 'walter', 'tuco']
+        self.test_facility.create_rooms('office', ['owfewfwefwefne'])
+        self.test_facility.add_staff(names)
+        self.assertEqual(len(self.test_facility.available_rooms()), 1)
+        room = self.test_facility.available_rooms()[0]
+        self.assertListEqual(room.occupants, names)

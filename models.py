@@ -105,7 +105,6 @@ class Facility(BaseModel):
                 # The person already exists
                 pass
 
-    # TODO: Allocate room after adding a staff member
     def add_staff(self, staff):
         """ Add staff members to a Facility
 
@@ -113,7 +112,12 @@ class Facility(BaseModel):
         """
         for name in staff:
             try:
-                Person.create(name=name, accomodation='N', role='Staff')
+                person = Person.create(
+                    name=name, accomodation='N', role='Staff')
+                room = random.choice([room
+                                      for room in self.available_rooms()
+                                      if room.room_type == 'Office'])
+                room.add_occupants(person)
             except IntegrityError:
                 # The person already exists
                 pass
