@@ -1,5 +1,4 @@
 import unittest
-import pytest
 
 from peewee import *
 
@@ -16,7 +15,7 @@ class RoomTest(unittest.TestCase):
         self.test_facility.drop_db()
 
     def test_should_not_create_invalid_room(self):
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             self.test_facility.create_rooms('bleh bleh', ['one', 'two'])
 
     def test_print_room_calls_instance_mehtod_print_occupants(self):
@@ -40,7 +39,7 @@ class LivingSpaceTest(unittest.TestCase):
 
     def test_create_living_space(self):
         self.test_facility.create_rooms('living_space', ['one', 'two'])
-        assert self.test_facility.rooms == 2
+        assert self.test_facility.room_count == 2
 
     def test_add_fellow_to_living_space(self):
         pass
@@ -66,7 +65,7 @@ class OfficeTest(unittest.TestCase):
 
     def test_create_office(self):
         self.test_facility.create_rooms('office', ['one', 'two'])
-        assert self.test_facility.rooms == 2
+        assert self.test_facility.room_count == 2
 
     def test_add_person_to_office(self):
         pass
