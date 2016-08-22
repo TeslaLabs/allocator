@@ -1,5 +1,4 @@
 import unittest
-import pytest
 
 from .context import models
 
@@ -17,8 +16,15 @@ class FacilityTest(unittest.TestCase):
         assert self.test_facility.name == 'Test-Amity'
 
     def test_available_rooms(self):
-        room = models.Room.create(name='Go', room_type='Living Space')
-        self.assertListEqual([room for room in models.Room.select()], self.test_facility.available_rooms())
+        self.assertListEqual(
+            [room for room in models.Room.select()],
+            self.test_facility.available_rooms())
+
+    def test_rooms(self):
+        names = ['Go', 'Perl', 'Shell']
+        for name in names:
+            models.Room.create(name=name, room_type='Living Space')
+        self.assertListEqual(self.test_facility.rooms, names)
 
     def test_create_facility_should_call_initialize_database(self):
         pass
