@@ -223,8 +223,12 @@ class Room(BaseModel):
         """Print the names of all the people in this room."""
         if len(self.occupants) == 0:
             print('Room has no occupants')
+            return None
+        return_string = ''
         for num, member in enumerate(self.occupants, start=1):
-            print('{}. {}'.format(num, member))
+            return_string += '{}. {}\n'.format(num, member)
+        print(return_string)
+        return return_string
 
     def add_occupants(self, *occupants):
         """Add an occupant to a room"""

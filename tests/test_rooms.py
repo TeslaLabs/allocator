@@ -1,6 +1,5 @@
 import unittest
 
-from peewee import *
 from faker import Factory
 
 from .context import models
@@ -24,21 +23,52 @@ class RoomTest(unittest.TestCase):
 
     def test_add_occupants_to_room(self):
         room = models.Room.create(name='Go', room_type='Living Space')
-        fellow = models.Person.create(name=fake.name(), accomodation='N', role='Fellow')
-        staff = models.Person.create(name=fake.name(), accomodation='N', role='Fellow')
+        fellow = models.Person.create(
+            name=fake.name(), accomodation='N', role='Fellow')
+        staff = models.Person.create(
+            name=fake.name(), accomodation='N', role='Fellow')
         room.add_occupants(fellow, staff)
         # The added people should be in the occupants list
         self.assertIn(fellow.name, room.occupants)
         self.assertIn(staff.name, room.occupants)
 
     def test_should_not_add_occupants_if_room_is_full(self):
-        pass
+        room = models.Room.create(
+            name=fake.color_name(), room_type='Living Space')
+        count = 0
+        while count < room.capacity:
+            person = models.Person.create(
+                name=fake.name(),
+                accomodation='N',
+                role='Fellow'
+            )
+            count += 1
+            room.add_occupants(person)
+        extra_person = models.Person.create(
+            name=fake.name(),
+            accomodation='N',
+            role='Fellow'
+        )
+        with self.assertRaises(Exception):
+            room.add_occupants(extra_person)
 
     def test_print_occupants(self):
+        names = [fake.name_male(), fake.name_female()]
+        room = models.Room.create(name='Go', room_type='Office')
+        fellow = models.Person.create(
+            name=names[0], accomodation='N', role='Fellow')
+        staff = models.Person.create(
+            name=names[1], accomodation='N', role='Staff')
+        room.add_occupants(fellow, staff)
+
+        return_string = ''
+        for num, name in enumerate(names, start=1):
+            return_string += '{}. {}\n'.format(num, name)
+        self.assertEqual(room.print_occupants(), return_string)
+
+    def test_print_occupants_returns_None_for_empty_room(self):
         room = models.Room.create(name='Go', room_type='Living Space')
-        fellow = models.Person.create(name='Kevin', accomodation='N', role='Fellow')
-        staff = models.Person.create(name='Staff Name', accomodation='N', role='Staff')
-        room.people.add([fellow, staff])
+        self.assertIsNone(room.print_occupants())
 
     def test_has_vacancy(self):
         pass
@@ -69,12 +99,10 @@ class LivingSpaceTest(unittest.TestCase):
 
     def test_should_not_add_staff_to_living_space(self):
         room = models.Room.create(name='Go', room_type='Living Space')
-        staff = models.Person.create(name=fake.name(), accomodation='N', role='Staff')
+        staff = models.Person.create(
+            name=fake.name(), accomodation='N', role='Staff')
         with self.assertRaises(Exception):
             room.add_occupants(staff)
-
-    def test_living_space_is_created_with_correct_capacity(self):
-        pass
 
 
 class OfficeTest(unittest.TestCase):
